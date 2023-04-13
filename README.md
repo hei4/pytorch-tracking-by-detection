@@ -81,7 +81,7 @@ $$
 **Covariance extrapolation equation**
 
 $$
-\bf{P}_{t+1} = \bf{F} \bf{P}_t \bf{F}^T + \bf{Q} 
+\bf{P}_{t+1} = \bf{F} \bf{P}_t \bf{F}^T + \bf{Q}_t 
 $$
 
 **Kalman gain**
