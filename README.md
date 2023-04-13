@@ -22,7 +22,7 @@ pip install matplotlib
 
 ## Kalman filter
 
-**State space**
+**State space (Pascal box style)**
 
 $$
 \bf{x} =
@@ -31,7 +31,7 @@ x_c & y_c & w & h & \frac{dx_c}{dt} & \frac{dy_c}{dt} & \frac{dw}{dt} & \frac{dh
 \end{bmatrix}^T
 $$
 
-**Observation space (Pascal box style)**
+**Observation space (YOLO box style and velocity)**
 
 $$
 \bf{z} = 
@@ -40,7 +40,7 @@ x_1 & y_1 & x_2 & y_2
 \end{bmatrix}^T
 $$
 
-**State transition matrix (YOLO box style and velocity)**
+**State transition matrix**
 
 $$
 \bf{F} = 
