@@ -19,7 +19,7 @@ class Tracker():
     def __init__(self, classname) -> None:
         self.classname = classname
         self.tracklets = []
-        self.max_lifetime = 10   # 紐付かなかったら消す
+        self.max_lifetime = 10   # 紐付かなかったら除去するフレーム数
         self.latest_id = 0
         self.iou_matrix = None
 
@@ -64,18 +64,6 @@ class Tracker():
             tracklet.predict()
 
     def associate(self, detect_boxes, detect_scores):
-        """TrackletとDetectionの紐付けを行う
-
-        - IoUマトリックスを作り記憶する
-        - Detectionインスタンスタンスのリストを作成する
-
-        Args:
-            detect_boxes (_type_): _description_
-            detect_scores (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
         if len(detect_boxes) == 0:
             active_detections = []
             remain_detections = []
@@ -109,25 +97,11 @@ class Tracker():
         return active_detections, remain_detections, active_tracklets, remain_tracklets
 
     def update(self, detections, tracklets):
-        """紐付けされたDetectionとTrackletでカルマンフィルタの更新を行う
-
-        Args:
-            detections (_type_): trackletsと対応がとれた順番であること
-            tracklets (_type_): detectionsと対応がとれた順番であること
-        """
         for detection, tracklet in zip(detections, tracklets):
             # updateされたtrackletのlifetimeは0にリセットされる
             tracklet.update(detection)
             
     def hold(self, tracklets):
-        """紐付けされなかったTrackletを保留する
-
-        Args:
-            tracklets (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
         remain_tracklets = []
         for tracklet in tracklets:
             if tracklet.get_lifetime() < self.max_lifetime:
@@ -137,14 +111,6 @@ class Tracker():
         return remain_tracklets
 
     def register(self, detections):
-        """紐付けされなかったがスコアの高いDetectionをTrackletとして登録する
-
-        Args:
-            detections (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
         new_tracklets = []
         for detection in detections:
             if detection.score > self.detect_register_threshold:

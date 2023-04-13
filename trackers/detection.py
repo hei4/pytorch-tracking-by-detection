@@ -2,12 +2,10 @@ from torchvision.ops import box_convert
 
 class Detection():
     def __init__(self, box, score) -> None:
-        # TODO: データ形式はndarrayかTensorか検討が必要
-
         self.pascal_box = box.numpy()   # Pascal形式での保存
         self.yolo_box = box_convert(box, 'xyxy', 'cxcywh').numpy()  # YOLO形式での保存
         self.score = score
-        
+
     def get_pascal_box(self):
         return self.pascal_box
 

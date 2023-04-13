@@ -15,12 +15,6 @@ def main():
     parser.add_argument('data_root', type=str)
     parser.add_argument('result_root', type=str)
     args = parser.parse_args()
-
-    # data_root = '/mnt/hdd/sika/Datasets/MOT17/test/MOT17-08-DPM/img1'
-    # result_root = 'result/MOT17-08-DPM'
-
-    # data_root = '/mnt/hdd/sika/Datasets/MOT17/test/MOT17-14-DPM/img1'
-    # result_root = 'result/MOT17-14-DPM'
     
     os.makedirs(args.result_root, exist_ok=True)
 
