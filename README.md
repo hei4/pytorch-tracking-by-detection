@@ -25,7 +25,7 @@ pip install matplotlib
 **State space**
 
 $$
-\bm{x} =
+\bold{x} =
 \begin{bmatrix}
 x_c & y_c & w & h & \frac{dx_c}{dt} & \frac{dy_c}{dt} & \frac{dw}{dt} & \frac{dh}{dt}
 \end{bmatrix}^T
@@ -34,7 +34,7 @@ $$
 **Observation space (Pascal box style)**
 
 $$
-\bm{z} = 
+\bold{z} = 
 \begin{bmatrix}
 x_1 & y_1 & x_2 & y_2
 \end{bmatrix}^T
@@ -43,7 +43,7 @@ $$
 **State transition matrix (YOLO box style and velocity)**
 
 $$
-\bm{F} = 
+\bold{F} = 
 \begin{bmatrix}
 1 & 0 & 0 & 0 & dt & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 & 0 & dt & 0 & 0 \\
@@ -59,7 +59,7 @@ $$
 **Observation matrix**
 
 $$
-\bm{H} = 
+\bold{H} = 
 \begin{bmatrix}
 1 & 0 & -\frac{1}{2} & 0 & 0 & 0 & 0 & 0 \\
 0 & 1 & 0 & -\frac{1}{2} & 0 & 0 & 0 & 0 \\
@@ -71,29 +71,29 @@ $$
 **State extrapolation equation**
 
 $$
-\bm{x}_{t+1} = \bm{F} \bm{x}_t
+\bold{x}_{t+1} = \bold{F} \bold{x}_t
 $$
 
 **Covariance extrapolation equation**
 
 $$
-\bm{P}_{t+1} = \bm{F} \bm{P}_t \bm{F}^T + \bm{Q} 
+\bold{P}_{t+1} = \bold{F} \bold{P}_t \bold{F}^T + \bold{Q} 
 $$
 
 **Kalman gain**
 
 $$
-\bm{K}_t = \bm{P}_{t-1} \bm{H}^T \lparen \bm{H} \bm{P}_{t-1} \bm{H}^T + \bm{R}_t \rparen^{-1}
+\bold{K}_t = \bold{P}_{t-1} \bold{H}^T \lparen \bold{H} \bold{P}_{t-1} \bold{H}^T + \bold{R}_t \rparen^{-1}
 $$
 
 **State update equation**
 
 $$
-\bm{x}_t = \bm{x}_{t-1} + \bm{K}_t \lparen \bm{z}_t - \bm{H} \bm{x}_{t-1} \rparen
+\bold{x}_t = \bold{x}_{t-1} + \bold{K}_t \lparen \bold{z}_t - \bold{H} \bold{x}_{t-1} \rparen
 $$
 
 **Covariance update equation**
 
 $$
-\bm{P}_t = \lparen \bm{I} - \bm{K}_t \bm{H} \rparen \bm{P}_{t-1} \lparen \bm{I} - \bm{K}_t \bm{H} \rparen^T + \bm{K}_t \bm{R}_t \bm{K}_t^T
+\bold{P}_t = \lparen \bold{I} - \bold{K}_t \bold{H} \rparen \bold{P}_{t-1} \lparen \bold{I} - \bold{K}_t \bold{H} \rparen^T + \bold{K}_t \bold{R}_t \bold{K}_t^T
 $$
