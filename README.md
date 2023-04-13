@@ -3,6 +3,10 @@
 **Tracking-by-Detection with PyTorch**
 
 
+https://user-images.githubusercontent.com/26747044/231817109-aef7156b-9e26-4729-af2c-877cdca476a3.mp4
+
+
+
 
 ## How to use
 
@@ -77,7 +81,7 @@ $$
 **Covariance extrapolation equation**
 
 $$
-\bf{P}_{t+1} = \bf{F} \bf{P}_t \bf{F}^T + \bf{Q} 
+\bf{P}_{t+1} = \bf{F} \bf{P}_t \bf{F}^T + \bf{Q}_t 
 $$
 
 **Kalman gain**
