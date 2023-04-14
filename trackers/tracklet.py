@@ -24,6 +24,7 @@ class Tracklet():
             [0., 0., 0., 0., 0., 0., 1., 0.],
             [0., 0., 0., 0., 0., 0., 0., 1.],
         ])  # システム行列 [8x8]
+        self.dt = dt
 
         self.H = np.array([
             [1., 0., -0.5, 0., 0., 0., 0., 0.],
@@ -33,11 +34,9 @@ class Tracklet():
         ])  # 観測行列 [4x8]
 
         # プロセスノイズの標準偏差
-        self.std_process_xy_position = 0.05
-        self.std_process_wh_position = 0.02
-        self.std_process_xy_velocity = 4. * self.std_process_xy_position / (dt**2)
-        self.std_process_wh_velocity = 4. * self.std_process_wh_position / (dt**2)
-
+        self.std_process_xy = 0.010
+        self.std_process_wh = 0.005
+        
         # 観測ノイズの標準偏差
         self.std_observation_xy = 0.05
 
@@ -48,14 +47,23 @@ class Tracklet():
         self.x = self.F @ self.x    # 本来は F@x+G@u だがここでは制御は無視する
 
         # プロセスノイズ共分散
-        box_height = self.x[3]
-        Q_std = np.concatenate([
-            np.full(2, self.std_process_xy_position * box_height),
-            np.full(2, self.std_process_wh_position * box_height),
-            np.full(2, self.std_process_xy_velocity * box_height),
-            np.full(2, self.std_process_wh_velocity * box_height),
+        box_height = self.x[3]       
+        xa = (box_height * self.std_process_xy)**2 * self.dt**5 / 20.
+        xb = (box_height * self.std_process_xy)**2 * self.dt**4 / 8.
+        xc = (box_height * self.std_process_xy)**2 * self.dt**3 / 3.
+        wa = (box_height * self.std_process_wh)**2 * self.dt**5 / 20.
+        wb = (box_height * self.std_process_wh)**2 * self.dt**4 / 8.
+        wc = (box_height * self.std_process_wh)**2 * self.dt**3 / 3.
+        Q = np.array([
+            [xa, 0., 0., 0., xc, 0., 0., 0.],
+            [0., xa, 0., 0., 0., xc, 0., 0.],
+            [0., 0., wa, 0., 0., 0., wc, 0.],
+            [0., 0., 0., wa, 0., 0., 0., wc],
+            [xc, 0., 0., 0., xb, 0., 0., 0.],
+            [0., xc, 0., 0., 0., xb, 0., 0.],
+            [0., 0., wc, 0., 0., 0., wb, 0.],
+            [0., 0., 0., wc, 0., 0., 0., wb],
         ])
-        Q = np.diag(np.square(Q_std))
 
         # 共分散遷移
         self.P = self.F @ self.P @ self.F.T + Q

@@ -16,11 +16,11 @@ from detection import Detection
 # self.match_th_low = 0.5
 
 class Tracker():
+    latest_id = 0
     def __init__(self, classname) -> None:
         self.classname = classname
         self.tracklets = []
         self.max_lifetime = 10   # 紐付かなかったら除去するフレーム数
-        self.latest_id = 0
         self.iou_matrix = None
 
         self.detect_pass_threshold = 0.4
@@ -116,7 +116,7 @@ class Tracker():
             if detection.score > self.detect_register_threshold:
                 # 新規登録されたTrackletのlifetimeは0で初期化される
                 new_tracklets.append(Tracklet(detection, self.latest_id))
-                self.latest_id += 1
+                Tracker.latest_id += 1
         return new_tracklets
 
     def get_pascal_boxes_and_ids(self, tracklets):
