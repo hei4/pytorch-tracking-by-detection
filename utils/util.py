@@ -53,7 +53,7 @@ def write_tracklet_image(image, active_boxes, active_ids, active_classnames, rem
         colors=make_colors(active_ids),
         fill=True,
         font='/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf',
-        font_size=24
+        font_size=18
     )
 
     result_image = vutils.draw_bounding_boxes(
@@ -63,7 +63,7 @@ def write_tracklet_image(image, active_boxes, active_ids, active_classnames, rem
         colors=make_colors(remain_ids),
         fill=False,
         font='/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf',
-        font_size=24
+        font_size=18
     )
 
     write_png(result_image, filename)
