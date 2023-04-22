@@ -1,20 +1,11 @@
 import numpy as np
+import matplotlib
 from matplotlib import pyplot as plt
+from matplotlib import patches
 import torch
-from torchvision.io import write_png
 from torchvision import utils as vutils
 
-
-def make_colors(indices):
-    N = 20
-    cmap = plt.get_cmap(f'tab{N}')
-
-    colors = np.array(cmap(indices % N))[:, :3]   # alphaは使用しない
-    colors = (255. * colors).astype(np.uint8).tolist()
-    colors = [tuple(color) for color in colors]     # tupleを要求されるのでlistから変換
-
-    return colors
-
+from trackers.base_tracker import BaseTracker
 
 label_to_class = [
     '__background__', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
@@ -30,40 +21,97 @@ label_to_class = [
     'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'N/A', 'book',
     'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
 ]
+
 class_to_label = {}
 for i, label in enumerate(label_to_class):
     class_to_label[label] = i
 
-def write_detection_image(image, boxes, scores, labels, filename):
-    result_image = vutils.draw_bounding_boxes(
-        (image.to('cpu') * 255.).to(torch.uint8),
-        boxes=boxes,
-        labels=[f'{label_to_class[label]}:{score:.3f}' for label, score in zip(labels, scores)],
-        colors=make_colors(labels),
-        font='/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf',
-        font_size=24
-    )
-    write_png(result_image, filename)
+N = 20
+cmap = plt.get_cmap(f'tab{N}')
 
-def write_tracklet_image(image, active_boxes, active_ids, active_classnames, remain_boxes, remain_ids, remain_classnames, filename):
+def make_colors(indices):
+    colors = np.array(cmap(indices % N))[:, :3]   # alphaは使用しない
+    colors = (255. * colors).astype(np.uint8).tolist()
+    colors = [tuple(color) for color in colors]     # tupleを要求されるのでlistから変換
+
+    return colors
+
+def write_tracklet_image(image, active_tracklets, remain_tracklets):
+    active_boxes, active_labels, active_ids = BaseTracker.get_pascal_boxes_labels_ids(active_tracklets)
     result_image = vutils.draw_bounding_boxes(
         (image.to('cpu') * 255.).to(torch.uint8),
-        boxes=torch.tensor(active_boxes),
-        labels=[f'{name}:{id}' for id, name in zip(active_ids, active_classnames)],
+        boxes=active_boxes,
+        labels=[f'{label_to_class[label]}:{id}' for label, id in zip(active_labels, active_ids)],
         colors=make_colors(active_ids),
         fill=True,
         font='/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf',
-        font_size=18
+        font_size=16
     )
 
+    remain_boxes, remain_labels, remain_ids = BaseTracker.get_pascal_boxes_labels_ids(remain_tracklets)
     result_image = vutils.draw_bounding_boxes(
         result_image,
-        boxes=torch.tensor(remain_boxes),
-        labels=[f'{name}:{id}' for id, name in zip(remain_ids, remain_classnames)],
+        boxes=remain_boxes,
+        labels=[f'{label_to_class[label]}:{id}' for label, id in zip(remain_labels, remain_ids)],
         colors=make_colors(remain_ids),
         fill=False,
         font='/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf',
-        font_size=18
+        font_size=16
     )
 
-    write_png(result_image, filename)
+    return result_image
+
+
+def write_tracklet_image_with_covariance(image, active_tracklets, remain_tracklets, filename):
+    result_image = write_tracklet_image(image, active_tracklets, remain_tracklets)
+
+    dpi = matplotlib.rcParams['figure.dpi']
+    _, image_height, image_width = result_image.shape
+    fig = plt.figure(figsize=(image_width/dpi, image_height/dpi), dpi=dpi)
+    ax = fig.add_subplot(111)
+    
+    ax.imshow(result_image.permute(1, 2, 0).numpy(), vmin=0, vmax=255)
+
+    for tracklet in active_tracklets + remain_tracklets:
+        pos, width, height, angle = tracklet.get_ellipse()
+        id = tracklet.get_id()
+        ellipse = patches.Ellipse(
+            xy=pos,
+            width=width,
+            height=height,
+            angle=angle,
+            color=cmap(id%N),
+            fill=False,
+            alpha=0.5,
+            clip_on=True
+        )
+        ax.add_patch(ellipse)
+
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    ax.axis('off')
+
+    plt.savefig(filename)
+    plt.close()
+
+
+def write_tracklet_image_with_particle(image, active_tracklets, remain_tracklets, filename):
+    result_image = write_tracklet_image(image, active_tracklets, remain_tracklets)
+
+    dpi = matplotlib.rcParams['figure.dpi']
+    _, image_height, image_width = result_image.shape
+    fig = plt.figure(figsize=(image_width/dpi, image_height/dpi), dpi=dpi)
+    ax = fig.add_subplot(111)
+    
+    ax.imshow(result_image.permute(1, 2, 0).numpy(), vmin=0, vmax=255)
+
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    ax.axis('off')
+
+    for tracklet in active_tracklets + remain_tracklets:
+        points = tracklet.get_points()
+        mask = (0 <= points[0]) & (points[0] < image_width-1) & (0 <= points[1]) & (points[1] < image_height-1)
+        id = tracklet.get_id()
+        ax.scatter(points[0, mask], points[1, mask], marker='.', s=1, color=cmap(id%N), alpha=0.05, clip_on=True)
+
+    plt.savefig(filename)
+    plt.close()
