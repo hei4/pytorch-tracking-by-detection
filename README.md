@@ -2,12 +2,6 @@
 
 **Tracking-by-Detection with PyTorch**
 
-
-https://user-images.githubusercontent.com/26747044/231817109-aef7156b-9e26-4729-af2c-877cdca476a3.mp4
-
-
-
-
 ## How to use
 
 ```shell
@@ -85,7 +79,6 @@ $$
     \sigma_y &= \alpha_y h \\
     \sigma_w &= \alpha_w h \\
     \sigma_h &= \alpha_h h \\
-
     \bf{Q} &= 
     \begin{bmatrix}
         \frac{\sigma_x^2 \Delta t^5}{20} & 0 & 0 & 0 & \frac{\sigma_x^2 \Delta t^4}{8} & 0 & 0 & 0 \\
