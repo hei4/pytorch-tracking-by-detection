@@ -1,6 +1,14 @@
 # pytorch-tracking-by-detection
 
-**Tracking-by-Detection with PyTorch**
+Tracking-by-Detection with PyTorch
+
+**Byte algorithm tracking**
+
+https://user-images.githubusercontent.com/26747044/233760094-e651da48-5ced-4856-9f9b-9de45937defa.mp4
+
+**Particle filter tracking**
+
+https://user-images.githubusercontent.com/26747044/233760125-c8288a4e-c62e-4376-a45a-f560fc79a132.mp4
 
 ## How to use
 
@@ -10,7 +18,7 @@ python run.py <tracking> <data_root> <result_root>
 
 - tracking
   - kalman: Kalman filter tracking
-  - byte: Byte track
+  - byte: Byte algorithm tracking [ByteTrack: Multi-Object Tracking by Associating Every Detection Box](https://arxiv.org/abs/2110.06864)
   - particle: Particle filter tracking
 
 ## Requirements
@@ -25,7 +33,7 @@ pip install matplotlib
 
 ## Kalman filter
 
-**State vector (YOLO box coordinate and velocity)**
+**State vector (YOLO box coordinates and velocity)**
 
 $$
 \bf{x} =
@@ -34,7 +42,7 @@ $$
 \end{bmatrix}^T
 $$
 
-**Observation vector (Pascal box coordinate)**
+**Observation vector (Pascal box coordinates)**
 
 $$
 \bf{z} = 
